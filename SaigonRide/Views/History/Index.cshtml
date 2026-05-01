@@ -1,0 +1,53 @@
+﻿@model IEnumerable<SaigonRide.Models.entities.RentalTransaction>
+@{
+    ViewData["Title"] = "Lịch sử chuyến đi";
+}
+<div class="d-flex align-items-center mb-4">
+    <a href="javascript:history.back()" class="btn btn-light rounded-circle me-3 shadow-sm"><i class="bi bi-arrow-left"></i></a>
+    <h4 class="fw-bold mb-0">Lịch sử chuyến đi</h4>
+</div>
+<div class="container mt-4">
+    <h2 class="text-success mb-4">Lịch sử thuê xe của @User.Identity.Name</h2>
+    
+    @if (!Model.Any())
+    {
+        <div class="alert alert-info">Bạn chưa có chuyến đi nào. Hãy ra Trang chủ thuê một chiếc nhé!</div>
+    }
+    else
+    {
+        <div class="table-responsive">
+            <table class="table table-hover shadow-sm bg-white">
+                <thead class="table-success">
+                    <tr>
+                        <th>Ngày thuê</th>
+                        <th>Loại xe</th>
+                        <th>Trạm trả</th>
+                        <th>Thanh toán</th>
+                        <th>Trạng thái</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model)
+                    {
+                        <tr>
+                            <td>@item.StartTime.ToString("dd/MM/yyyy HH:mm")</td>
+                            <td>@item.Vehicle.Category</td>
+                            <td>@item.ReturnStation.LocationName</td>
+                            <td class="fw-bold text-danger">@item.TotalDue.ToString("N0") VNĐ</td>
+                            <td>
+                                @if (item.IsDiscountApplied)
+                                {
+                                    <span class="badge bg-warning text-dark">Giảm 15%</span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-secondary">Bình thường</span>
+                                }
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+</div>

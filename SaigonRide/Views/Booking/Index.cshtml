@@ -1,0 +1,164 @@
+﻿@model IEnumerable<SaigonRide.Models.entities.Station>
+@{ ViewData["Title"] = "Bản đồ Trạm xe"; }
+
+<!-- Thư viện Bản đồ Leaflet.js (Load trực tiếp từ CDN) -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+<style>
+    /* Fix nhỏ cho cái Dropdown ở Navbar của cậu luôn nè */
+    .dropdown-menu-end { right: 0; left: auto; margin-top: 10px !important; }
+    
+    /* CSS cho khu vực bản đồ */
+    .map-container { height: 70vh; width: 100%; border-radius: 20px; z-index: 1; }
+    .station-panel { height: 70vh; overflow-y: auto; border-radius: 20px; }
+    .custom-marker { filter: hue-rotate(120deg); /* Đổi màu marker mặc định sang màu xanh lá của app */ }
+</style>
+
+<div class="container mt-3 mb-5">
+    <div class="d-flex align-items-center mb-3">
+        <a asp-controller="Home" asp-action="Index" class="btn btn-light rounded-circle me-3 shadow-sm"><i class="bi bi-arrow-left"></i></a>
+        <h4 class="fw-bold mb-0">Bản đồ Trạm xe SaigonRide</h4>
+    </div>
+
+    <div class="row g-4">
+        <!-- Cột trái: Bản đồ tương tác -->
+        <div class="col-lg-8">
+            <div class="card border-0 shadow-sm rounded-4 overflow-hidden p-1 bg-white">
+                <div id="saigonMap" class="map-container"></div>
+            </div>
+        </div>
+
+        <!-- Cột phải: Khung hiển thị danh sách xe (Sẽ đổi nội dung bằng JS) -->
+        <div class="col-lg-4">
+            <div class="card border-0 shadow-sm station-panel bg-white" id="stationDetailPanel">
+                <div class="card-body text-center d-flex flex-column justify-content-center align-items-center h-100 p-5">
+                    <div class="bg-success bg-opacity-10 p-4 rounded-circle mb-3">
+                        <i class="bi bi-geo-alt fs-1 text-success"></i>
+                    </div>
+                    <h5 class="fw-bold text-dark">Chọn một trạm</h5>
+                    <p class="small text-muted mb-0">Click vào biểu tượng trạm trên bản đồ để xem các xe đang rảnh.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // 1. Khởi tạo bản đồ, lấy tâm là trung tâm TP.HCM
+    var map = L.map('saigonMap').setView([10.785, 106.705], 13);
+
+    // 2. Phủ lớp bản đồ đường phố lên
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        maxZoom: 19,
+        attribution: '&copy; OpenStreetMap'
+    }).addTo(map);
+
+    // 3. Lấy dữ liệu từ C#
+    var stationsData = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.Select(s => new {
+        id = s.Id,
+        name = s.LocationName,
+        lat = s.Latitude,
+        lng = s.Longitude,
+        inventory = s.CurrentInventory,
+        capacity = s.MaxCapacity,
+        vehicles = s.Vehicles.Where(v => (int)v.Status == 0).Select(v => new { id = v.Id, name = v.Category, price = v.PricePerMinute })
+    })));
+
+    var bounds = [];
+    var currentStation = null; // Biến lưu trạm đang được chọn để lọc xe
+
+    // 4. Quét qua từng trạm và gắn Ghim
+    stationsData.forEach(function (st) {
+        var finalLat = st.lat !== 0 ? st.lat : (st.id === 1 ? 10.776889 : 10.801534);
+        var finalLng = st.lng !== 0 ? st.lng : (st.id === 1 ? 106.700806 : 106.711075);
+        bounds.push([finalLat, finalLng]);
+
+        var marker = L.marker([finalLat, finalLng]).addTo(map);
+        marker.bindTooltip("🚲 " + st.name, { permanent: true, direction: 'top', offset: [0, -20] });
+
+        // 5. THAY THẾ: Xử lý khi click vào Marker với Input tìm kiếm
+        marker.on('click', function () {
+            currentStation = st; // Gán trạm hiện tại
+            renderStationDetail(st.vehicles);
+        });
+    });
+
+    // Hàm render nội dung Panel (Tách ra để dùng cho cả việc Click và Lọc)
+    function renderStationDetail(vehiclesList) {
+        var panel = document.getElementById('stationDetailPanel');
+        var st = currentStation;
+
+        var html = `
+            <div class="card-header bg-white border-0 pt-4 pb-2">
+                <h5 class="fw-bold text-success mb-1"><i class="bi bi-geo-alt-fill me-2"></i>${st.name}</h5>
+                <p class="text-muted small mb-3">Chỗ trống: ${st.capacity - st.inventory} | Xe sẵn sàng: <strong class="text-dark">${st.inventory}</strong></p>
+                
+                <!-- Ô tìm kiếm xe -->
+                <div class="input-group input-group-sm mb-2 shadow-sm rounded-pill overflow-hidden border">
+                    <span class="input-group-text bg-white border-0"><i class="bi bi-search text-muted"></i></span>
+                    <input type="text" id="vehicleSearch" class="form-control border-0" placeholder="Tìm loại xe..." onkeyup="filterVehicles()">
+                </div>
+            </div>
+            <div class="card-body pt-0">
+                <hr class="text-muted opacity-25 mt-0">
+                <div class="list-group list-group-flush gap-2" id="vehicleList">
+        `;
+
+        if (vehiclesList.length === 0) {
+            html += `<div class="alert alert-warning border-0 rounded-3 text-center py-4">
+                        <i class="bi bi-emoji-frown fs-3 d-block mb-2"></i>Không tìm thấy xe phù hợp!
+                     </div>`;
+        } else {
+            vehiclesList.forEach(function (v) {
+                html += `
+                    <div class="list-group-item px-3 py-3 border rounded-3 bg-light d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="mb-1 fw-bold text-dark">${v.name}</h6>
+                            <span class="badge bg-success bg-opacity-25 text-success rounded-pill">${v.price.toLocaleString('vi-VN')} đ/phút</span>
+                        </div>
+                        <a href="/Checkout/Rent?vehicleId=${v.id}" class="btn btn-dark rounded-pill px-4 fw-bold shadow-sm">Thuê</a>
+                    </div>
+                `;
+            });
+        }
+
+        html += `</div></div>`;
+        panel.innerHTML = html;
+    }
+
+    // Hàm lọc xe khi gõ phím
+    window.filterVehicles = function() {
+        var keyword = document.getElementById('vehicleSearch').value.toLowerCase();
+        var filtered = currentStation.vehicles.filter(v => 
+            v.name.toLowerCase().includes(keyword)
+        );
+        
+        // Render lại danh sách list-group thay vì toàn bộ panel để mượt hơn
+        var listContainer = document.getElementById('vehicleList');
+        var listHtml = "";
+
+        if (filtered.length === 0) {
+            listHtml = `<div class="alert alert-warning border-0 rounded-3 text-center py-4 w-100">Không tìm thấy xe!</div>`;
+        } else {
+            filtered.forEach(function (v) {
+                listHtml += `
+                    <div class="list-group-item px-3 py-3 border rounded-3 bg-light d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="mb-1 fw-bold text-dark">${v.name}</h6>
+                            <span class="badge bg-success bg-opacity-25 text-success rounded-pill">${v.price.toLocaleString('vi-VN')} đ/phút</span>
+                        </div>
+                        <a href="/Checkout/Rent?vehicleId=${v.id}" class="btn btn-dark rounded-pill px-4 fw-bold shadow-sm">Thuê</a>
+                    </div>
+                `;
+            });
+        }
+        listContainer.innerHTML = listHtml;
+    };
+
+    // 6. Ép bản đồ tự động zoom
+    if(bounds.length > 0) {
+        map.fitBounds(bounds, { padding: [50, 50] });
+    }
+</script>
+ 

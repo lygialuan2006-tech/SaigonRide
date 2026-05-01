@@ -1,0 +1,45 @@
+﻿@{
+    ViewData["Title"] = "Thanh toán chuyến đi";
+}
+
+<div class="container mt-5">
+    <div class="card shadow-sm" style="max-width: 500px; margin: auto;">
+        <div class="card-header bg-success text-white text-center">
+            <h3>Hóa Đơn Của Bạn</h3>
+        </div>
+        <div class="card-body">
+            <p class="fs-5 text-primary fw-bold">
+                👤 Khách hàng: @User.Identity.Name (@User.FindFirst("UserType")?.Value)
+            </p>
+            <hr />
+            <p><strong>Loại xe:</strong> @ViewBag.VehicleName</p>
+            <p><strong>Trạm trả xe:</strong> @ViewBag.StationName</p>
+            <p><strong>Thời gian thuê:</strong> @ViewBag.Duration phút</p>
+            <hr />
+            <p><strong>Giá gốc:</strong> @ViewBag.BasePrice.ToString("N0") VNĐ</p>
+            
+            @if (ViewBag.IsDiscounted)
+            {
+                <div class="alert alert-warning">
+                    <strong>🎉 Chúc mừng!</strong> Trạm đích đang thiếu xe. Bạn được giảm 15% cước phí!
+                </div>
+            }
+
+            <h4 class="text-danger mt-3">
+                <strong>Tổng thanh toán:</strong> @ViewBag.FinalPrice.ToString("N0") VNĐ
+            </h4>
+        </div>
+        <div class="card-footer text-center">
+            <!-- Form gửi dữ liệu ngầm lên hàm ConfirmPayment -->
+            <form asp-controller="Checkout" asp-action="ConfirmPayment" method="post">
+                <input type="hidden" name="vehicleId" value="@ViewBag.VehicleId" />
+                <input type="hidden" name="returnStationId" value="@ViewBag.ReturnStationId" />
+                <input type="hidden" name="duration" value="@ViewBag.Duration" />
+                <input type="hidden" name="finalPrice" value="@ViewBag.FinalPrice" />
+                
+                <button type="submit" class="btn btn-primary w-100 mb-2 fs-5 fw-bold">Xác nhận Thanh toán</button>
+            </form>
+            <a asp-controller="Home" asp-action="Index" class="btn btn-outline-secondary w-100">Hủy chuyến</a>
+        </div>
+    </div>
+</div>

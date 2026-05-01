@@ -8,19 +8,16 @@
 <div class="row justify-content-center super-app-bg pt-3 pb-5">
     <div class="col-md-8 col-lg-6">
 
-        <!-- Header: User & Wallet Widget -->
         <div class="d-flex justify-content-between align-items-center mb-4 px-2">
             <div>
                 <h4 class="fw-bold text-dark mb-0">@Localizer["Greeting", User.Identity.Name]</h4>
                 <span class="badge bg-dark rounded-pill mt-1">@User.FindFirst("UserType")?.Value Member</span>
             </div>
-            <!-- Nút Avatar nhỏ bên góc cho cân đối -->
             <div class="bg-success text-white rounded-circle d-flex justify-content-center align-items-center shadow-sm" style="width: 45px; height: 45px; font-size: 1.2rem; font-weight: bold;">
                 @User.Identity.Name.Substring(0, 1).ToUpper()
             </div>
         </div>
 
-        <!-- BIG BUTTON: Rent Car (The Real Thing) -->
         <a asp-controller="Booking" asp-action="Index" class="btn-main-action shadow p-4 mb-4">
             <div class="d-flex justify-content-between align-items-center">
                 <div>
@@ -33,7 +30,6 @@
             </div>
         </a>
 
-        <!-- 3 Essential Buttons (History, Settings, Contact) -->
         <div class="row g-3 mb-4">
             <div class="col-4">
                 <a asp-controller="History" asp-action="Index" class="btn-secondary-action shadow-sm widget-card h-100">
@@ -55,7 +51,6 @@
             </div>
         </div>
 
-        <!-- Thêm Options/Widgets mở rộng cho hiện đại -->
         <h6 class="fw-bold text-muted mb-3 px-2">@Localizer["RecentActivity"]</h6>
         @if (Model != null)
         {
@@ -81,7 +76,6 @@
             </div>
         }
 
-        <!-- Promo Widget -->
         <div class="card widget-card bg-dark text-white p-3 overflow-hidden position-relative">
             <div class="position-relative z-1">
                 <span class="badge bg-warning text-dark mb-2">@Localizer["Promo"]</span>

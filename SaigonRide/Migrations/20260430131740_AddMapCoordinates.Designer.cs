@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using SaigonRide.Data;
 
@@ -11,9 +12,11 @@ using SaigonRide.Data;
 namespace SaigonRide.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260430131740_AddMapCoordinates")]
+    partial class AddMapCoordinates
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -21,57 +24,6 @@ namespace SaigonRide.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
-
-            modelBuilder.Entity("SaigonRide.Models.entities.Announcement", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("Content")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("Title")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Type")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Announcements");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            Content = "Giảm ngay 15% khi trả xe tại trạm Bình Thạnh.",
-                            CreatedAt = new DateTime(2026, 4, 30, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            IsActive = true,
-                            Title = "Thả ga vi vu cuối tuần!",
-                            Type = "Promo"
-                        },
-                        new
-                        {
-                            Id = 2,
-                            Content = "Cuối tuần này trạm Quận 1 sẽ tạm ngưng nhận xe trả để nâng cấp.",
-                            CreatedAt = new DateTime(2026, 4, 30, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            IsActive = true,
-                            Title = "Bảo trì trạm Quận 1",
-                            Type = "Warning"
-                        });
-                });
 
             modelBuilder.Entity("SaigonRide.Models.entities.RentalTransaction", b =>
                 {
