@@ -1,0 +1,46 @@
+﻿@model SaigonRide.Models.entities.User
+@{
+    ViewData["Title"] = "Cập nhật Người dùng";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card border-0 shadow-sm rounded-4">
+            <div class="card-header bg-white border-bottom pt-4 pb-3 px-4">
+                <h5 class="fw-bold text-dark mb-0"><i class="bi bi-person-lines-fill text-primary me-2"></i>Cập nhật Hồ sơ Khách hàng</h5>
+            </div>
+            <div class="card-body p-4">
+                <form asp-action="Edit" method="post">
+                    <input type="hidden" asp-for="Id" />
+                    
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Họ và Tên</label>
+                        <input asp-for="FullName" class="form-control bg-light" required />
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Email</label>
+                        <!-- Email để readonly vì đây là tài khoản đăng nhập -->
+                        <input asp-for="Email" type="email" class="form-control bg-light" required readonly title="Không thể thay đổi Email" />
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Số điện thoại</label>
+                        <input asp-for="Phone" class="form-control bg-light" placeholder="Chưa cập nhật" />
+                    </div>
+                    
+                    <div class="mb-4">
+                        <label class="form-label fw-bold">CCCD/Hộ chiếu</label>
+                        <input asp-for="DocumentId" class="form-control bg-light" placeholder="Chưa xác minh" />
+                    </div>
+
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-primary fw-bold py-2"><i class="bi bi-check-lg me-1"></i> Lưu Thay Đổi</button>
+                        <a href="/AdminUser/Index" class="btn btn-light border fw-bold py-2">Hủy bỏ</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
