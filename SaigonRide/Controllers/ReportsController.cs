@@ -90,5 +90,46 @@ namespace SaigonRide.Controllers
             return View(await reports.OrderByDescending(r => r.CreatedAt).ToListAsync());
         }
 
+        // Admin trả lời báo cáo 
+        [HttpPost]
+        public async Task<IActionResult> RespondToReport(int reportId, string adminResponse, string status)
+        {
+            // Tự check quyền Admin thủ công
+            if (User.FindFirst("UserType")?.Value != "Admin")
+                return RedirectToAction("Index", "Home");
+
+            var report = await _context.Reports.FindAsync(reportId);
+            if (report == null) return NotFound();
+
+            report.AdminResponse = adminResponse;
+            report.Status = (ReportStatus)Enum.Parse(typeof(ReportStatus), status);
+            report.RespondedAt = DateTime.Now;
+
+            _context.Reports.Update(report);
+            await _context.SaveChangesAsync();
+
+            TempData["SuccessMessage"] = "Đã gửi phản hồi thành công!";
+            return RedirectToAction("AdminReports");
+        }
+
+        // Xem chi tiết báo cáo
+        public async Task<IActionResult> ReportDetails(int id)
+        {
+            var report = await _context.Reports
+                .Include(r => r.RentalTransaction)
+                .Include(r => r.User)
+                .FirstOrDefaultAsync(r => r.Id == id);
+
+            if (report == null) return NotFound();
+
+            var userIdString = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            bool isAdmin = User.FindFirst("UserType")?.Value == "Admin";
+
+            // Nếu không phải người tạo báo cáo và cũng không phải Admin thì đuổi ra
+            if (report.UserId.ToString() != userIdString && !isAdmin)
+                return RedirectToAction("Index", "Home");
+
+            return View(report);
+        }
     }
 }
