@@ -1,0 +1,46 @@
+﻿@{
+    ViewData["Title"] = "Đăng nhập";
+}
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-5">
+            <div class="card shadow border-0 rounded-3">
+                <div class="card-header bg-dark text-white text-center py-3">
+                    <h4 class="mb-0">Đăng Nhập SaigonRide</h4>
+                </div>
+                <div class="card-body p-4">
+                    @if (ViewBag.Error != null)
+                    {
+                        <div class="alert alert-danger">@ViewBag.Error</div>
+                    }
+
+                    <form asp-controller="Account" asp-action="Login" method="post">
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Email</label>
+                            <input type="email" name="email" class="form-control" placeholder="example@email.com" required />
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Mật khẩu</label>
+                            <input type="password" name="password" class="form-control" placeholder="••••••••" required />
+                        </div>
+
+                        <!-- Chức năng QoL: Quên mật khẩu -->
+                        <div class="d-flex justify-content-end mb-4">
+                            <a href="#" class="text-decoration-none text-success small" onclick="alert('Tính năng gửi email khôi phục đang được phát triển!')">Quên mật khẩu?</a>
+                        </div>
+
+                        <button type="submit" class="btn btn-success w-100 fs-5 mb-3">Vào hệ thống</button>
+                        
+                        <!-- Chuyển sang Đăng ký -->
+                        <div class="text-center">
+                            <span class="text-muted">Chưa có tài khoản?</span>
+                            <a asp-controller="Account" asp-action="Register" class="text-decoration-none fw-bold">Đăng ký ngay</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

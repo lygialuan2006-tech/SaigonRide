@@ -1,0 +1,47 @@
+﻿@{ ViewData["Title"] = "Hỗ trợ & Thông báo"; }
+
+<style>
+    .modern-card { border-radius: 20px; border: none; box-shadow: 0 10px 30px rgba(0,0,0,0.05); }
+    .accordion-button:not(.collapsed) { background-color: #e8f5e9; color: #198754; font-weight: bold; }
+</style>
+
+<div class="container mt-5">
+    <div class="d-flex align-items-center mb-4">
+        <a href="javascript:history.back()" class="btn btn-light rounded-circle me-3 shadow-sm"><i class="bi bi-arrow-left"></i></a>
+        <h4 class="fw-bold mb-0">Cài đặt tài khoản</h4>
+    </div>
+    <div class="row">
+        <!-- Thông báo từ Admin -->
+        <div class="col-md-6 mb-4">
+            <div class="card modern-card p-4 h-100 border-start border-success border-5">
+                <h4 class="fw-bold mb-4">📢 Thông báo hệ thống</h4>
+                <div class="alert alert-warning border-0 rounded-3" role="alert">
+                    <h6 class="fw-bold">🚧 Bảo trì trạm Quận 1</h6>
+                    <p class="mb-0 small">Vào cuối tuần này (02/05/2026), trạm Quận 1 sẽ tạm ngưng nhận xe trả để nâng cấp mái che. Mong quý khách thông cảm!</p>
+                </div>
+                <div class="alert alert-info border-0 rounded-3" role="alert">
+                    <h6 class="fw-bold">🎉 Khuyến mãi chào hè</h6>
+                    <p class="mb-0 small">Trả xe tại trạm Bình Thạnh để luôn được giảm giá 15% vào giờ cao điểm.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- FAQ / Hỏi đáp -->
+        <div class="col-md-6 mb-4">
+            <div class="card modern-card p-4 h-100">
+                <h4 class="fw-bold mb-4">🎧 Câu hỏi thường gặp (FAQ)</h4>
+                <div class="accordion accordion-flush" id="faqAccordion">
+                    <div class="accordion-item">
+                        <h2 class="accordion-header"><button class="accordion-button rounded-3" type="button" data-bs-toggle="collapse" data-bs-target="#faq1">Tôi có thể thanh toán bằng gì?</button></h2>
+                        <div id="faq1" class="accordion-collapse collapse show"><div class="accordion-body small text-muted">Hệ thống hỗ trợ Momo, VNPay, Tiền mặt và Apple Pay.</div></div>
+                    </div>
+                    <div class="accordion-item">
+                        <h2 class="accordion-header"><button class="accordion-button collapsed rounded-3" type="button" data-bs-toggle="collapse" data-bs-target="#faq2">Làm sao để biết xe đang bận?</button></h2>
+                        <div id="faq2" class="accordion-collapse collapse"><div class="accordion-body small text-muted">Trên bản đồ, xe có màu xám nghĩa là Đang bảo trì hoặc Đang có người thuê.</div></div>
+                    </div>
+                </div>
+                <button class="btn btn-dark rounded-pill mt-4 w-100 fw-bold">Gửi yêu cầu hỗ trợ (Ticket)</button>
+            </div>
+        </div>
+    </div>
+</div>

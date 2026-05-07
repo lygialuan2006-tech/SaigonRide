@@ -1,0 +1,73 @@
+﻿@{
+    ViewData["Title"] = "Đăng ký tài khoản";
+}
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card shadow-sm border-0 rounded-3">
+                <div class="card-header bg-success text-white text-center py-3">
+                    <h4 class="mb-0">Tham gia SaigonRide</h4>
+                </div>
+                <div class="card-body p-4">
+                    @if (ViewBag.Error != null)
+                    {
+                        <div class="alert alert-danger">@ViewBag.Error</div>
+                    }
+
+                    <form asp-controller="Account" asp-action="Register" method="post">
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Họ và tên</label>
+                            <input type="text" name="FullName" class="form-control" required />
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Email</label>
+                            <input type="email" name="Email" class="form-control" required />
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Mật khẩu</label>
+                            <input type="password" name="Password" class="form-control" required />
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Bạn là ai?</label>
+                            <select id="userTypeSelect" name="UserType" class="form-select" onchange="toggleDocumentType()" required>
+                                <option value="Local">Người dân địa phương (Local)</option>
+                                <option value="Tourist">Khách du lịch (Tourist)</option>
+                            </select>
+                        </div>
+
+                        <!-- Khu vực ID động -->
+                        <div class="mb-4">
+                            <label id="docLabel" class="form-label fw-bold text-primary">Số CCCD (Identity Card)</label>
+                            <input type="text" name="DocumentId" id="docInput" class="form-control" placeholder="Nhập mã số định danh..." required />
+                        </div>
+
+                        <button type="submit" class="btn btn-dark w-100 fs-5 mb-3">Tạo tài khoản</button>
+
+                        <div class="text-center">
+                            <span class="text-muted">Đã có tài khoản?</span>
+                            <a asp-controller="Account" asp-action="Login" class="text-decoration-none fw-bold text-success">Đăng nhập</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function toggleDocumentType() {
+        var userType = document.getElementById("userTypeSelect").value;
+        var docLabel = document.getElementById("docLabel");
+        var docInput = document.getElementById("docInput");
+        
+        if (userType === "Local") {
+            docLabel.innerText = "Số CCCD (Identity Card)";
+            docInput.placeholder = "Nhập 12 số CCCD...";
+        } else {
+            docLabel.innerText = "Số Hộ Chiếu (Passport Number)";
+            docInput.placeholder = "Nhập mã số Hộ chiếu...";
+        }
+    }
+</script>

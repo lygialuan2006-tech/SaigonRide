@@ -12,8 +12,8 @@ using SaigonRide.Data;
 namespace SaigonRide.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20260430105415_InitialDB")]
-    partial class InitialDB
+    [Migration("20260430121333_AddUsersAndVehicleStatus")]
+    partial class AddUsersAndVehicleStatus
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -32,6 +32,10 @@ namespace SaigonRide.Migrations
                         .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("CustomerName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime?>("EndTime")
                         .HasColumnType("datetime2");
@@ -81,6 +85,66 @@ namespace SaigonRide.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Stations");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            CurrentInventory = 42,
+                            LocationName = "District 1, HCM",
+                            MaxCapacity = 50
+                        },
+                        new
+                        {
+                            Id = 3,
+                            CurrentInventory = 3,
+                            LocationName = "Binh Thanh, HCM",
+                            MaxCapacity = 20
+                        });
+                });
+
+            modelBuilder.Entity("SaigonRide.Models.entities.User", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("DocumentId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("FullName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Password")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("UserType")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Users");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            DocumentId = "000000000",
+                            Email = "admin@saigonride.com",
+                            FullName = "System Admin",
+                            Password = "123",
+                            UserType = "Admin"
+                        });
                 });
 
             modelBuilder.Entity("SaigonRide.Models.entities.Vehicle", b =>
@@ -101,11 +165,40 @@ namespace SaigonRide.Migrations
                     b.Property<int>("StationId")
                         .HasColumnType("int");
 
+                    b.Property<int>("Status")
+                        .HasColumnType("int");
+
                     b.HasKey("Id");
 
                     b.HasIndex("StationId");
 
                     b.ToTable("Vehicles");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            Category = "Standard Bike",
+                            PricePerMinute = 500m,
+                            StationId = 1,
+                            Status = 0
+                        },
+                        new
+                        {
+                            Id = 2,
+                            Category = "E-Scooter",
+                            PricePerMinute = 1500m,
+                            StationId = 1,
+                            Status = 0
+                        },
+                        new
+                        {
+                            Id = 3,
+                            Category = "Premium E-Bike",
+                            PricePerMinute = 2000m,
+                            StationId = 3,
+                            Status = 2
+                        });
                 });
 
             modelBuilder.Entity("SaigonRide.Models.entities.RentalTransaction", b =>
