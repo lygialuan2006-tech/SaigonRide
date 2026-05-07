@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
 using SaigonRide.Data;
 using System.Linq;
+using System.Text.Json; // Bắt buộc phải có để đóng gói JSON
 
 namespace SaigonRide.Controllers
 {
@@ -16,12 +17,31 @@ namespace SaigonRide.Controllers
             _context = context;
         }
 
-        // Màn hình chọn Trạm/Bản đồ bắt đầu đặt xe
         public IActionResult Index()
         {
+            // 1. Kéo Trạm và kèm theo danh sách Xe (Include)
             var stations = _context.Stations
                                    .Include(s => s.Vehicles)
+                                   .Where(s => s.IsAvailable)
                                    .ToList();
+
+            // 2. Đóng gói dữ liệu gửi xuống Javascript
+            var stationsData = stations.Select(s => new {
+                id = s.Id,
+                name = s.LocationName,
+                lat = s.Latitude,
+                lng = s.Longitude,
+                inventory = s.CurrentInventory,
+                capacity = s.MaxCapacity,
+
+                // ĐÂY LÀ DÒNG CHỐT HẠ: Phải có dòng này thì JS mới thấy được 4 chiếc xe!
+                // Tớ thêm luôn tính năng chỉ lọc ra những xe có trạng thái "Available" (Sẵn sàng)
+                vehicles = s.Vehicles.Where(v => v.Status == SaigonRide.Models.Enums.VehicleStatus.Available)
+                                     .Select(v => new { id = v.Id, name = v.Category, price = v.PricePerMinute }).ToList()
+            }).ToList();
+
+            ViewBag.StationsJson = JsonSerializer.Serialize(stationsData);
+
             return View(stations);
         }
     }
