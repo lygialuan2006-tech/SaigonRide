@@ -90,7 +90,7 @@ namespace SaigonRide.Controllers
             return View(await reports.OrderByDescending(r => r.CreatedAt).ToListAsync());
         }
 
-        // Admin trả lời báo cáo (ĐÃ XÓA SẠCH [Authorize(Roles="Admin")])
+        // Admin trả lời báo cáo 
         [HttpPost]
         public async Task<IActionResult> RespondToReport(int reportId, string adminResponse, string status)
         {

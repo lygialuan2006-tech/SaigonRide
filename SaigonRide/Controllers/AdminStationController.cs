@@ -84,7 +84,7 @@ namespace SaigonRide.Controllers
             var station = _context.Stations.Find(id);
             if (station == null) return NotFound();
 
-            // 1. Kiểm tra xe đang đỗ (Code cũ của cậu)
+            // 1. Kiểm tra xe đang đỗ tại trạm này
             var hasVehicles = _context.Vehicles.Any(v => v.StationId == id);
             if (station.CurrentInventory > 0 || hasVehicles)
             {
